@@ -9,6 +9,10 @@ export const GlobalStyle = createGlobalStyle`
   text-decoration: none;
 }
 
+body {
+  background-color: ${({ theme }) => theme.body};
+}
+
 textarea:focus, input:focus, select:focus {
     outline: 0;
 } 

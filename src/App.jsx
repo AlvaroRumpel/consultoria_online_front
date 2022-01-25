@@ -11,7 +11,9 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import NotFound from "./components/NotFound";
 import Home from "./components/Home";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import InsertExercise from "./components/InsertExercise";
+import TrainingSheet from "./components/TrainingSheet";
 
 function App() {
   const [theme, setTheme] = useState(true);
@@ -21,7 +23,7 @@ function App() {
   };
   return (
     <Router>
-      <ThemeProvider theme={theme ? themeClaro : themeEscuro}>
+      <ThemeProvider theme={theme ? themeEscuro : themeClaro}>
         <BtnTema onClick={toggleTheme}>
           <ThemeSwitcher theme={theme} />
         </BtnTema>
@@ -32,6 +34,7 @@ function App() {
           <Route exact path="/login" element={<Login />} />
           <Route exact path="/singup" element={<Singup />} />
           <Route exact path="/insert-exercise" element={<InsertExercise />} />
+          <Route exact path="/training-sheet/*" element={<TrainingSheet />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <ToastContainer position="bottom-center" theme="colored" />

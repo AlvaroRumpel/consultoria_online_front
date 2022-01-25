@@ -17,7 +17,6 @@ export const SectionV = styled.section`
   padding: 1rem 1rem;
   width: 100%;
   height: 100%;
-  background-color: ${({ theme }) => theme.body};
 `;
 
 export const SectionH = styled.section`
@@ -27,7 +26,6 @@ export const SectionH = styled.section`
   justify-content: space-evenly;
   margin: 1rem 2rem;
   width: 100%;
-  background-color: ${({ theme }) => theme.body};
 `;
 
 export const Title = styled.h1`
