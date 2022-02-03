@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Icons, InputStandard } from "../styles";
+import { Icons } from "../styles";
 import { corSecundaria } from "../styles/GlobalStyles";
 
 export const Sheet = styled.div`
@@ -19,14 +19,22 @@ export const Sheet = styled.div`
   }
 `;
 
-export const FormSheet = styled.form`
+export const SheetSection = styled.section`
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   width: 100%;
+  border: 2px dotted ${corSecundaria};
+  border-radius: 15px;
+  padding: 0.5rem;
+  margin: 1rem 0;
+
+  @media (max-width: 768px) {
+    justify-content: space-around;
+  }
 `;
 
-export const SheetSection = styled.section`
+export const SheetFormSection = styled.form`
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -60,13 +68,6 @@ export const Selector = styled.select`
 export const Option = styled.option`
   font-size: 1rem;
   font-weight: 600;
-`;
-
-export const InputSheet = styled(InputStandard)`
-  margin: 0;
-  width: 12rem;
-  height: 100%;
-  background-color: ${({ theme }) => theme.body};
 `;
 
 export const SelectorSheet = styled(Selector)`
