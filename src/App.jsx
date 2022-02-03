@@ -2,7 +2,6 @@ import Login from "./components/Login";
 import Singup from "./components/Singup";
 import { GlobalStyle } from "./components/styles/GlobalStyles";
 import { ThemeProvider } from "styled-components";
-import { useState } from "react/cjs/react.development";
 import { themeClaro, themeEscuro } from "./components/styles/theme";
 import ThemeSwitcher from "./components/ThemeSwitcher";
 import { BtnTema } from "./components/styles";
@@ -14,6 +13,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import InsertExercise from "./components/InsertExercise";
 import TrainingSheet from "./components/TrainingSheet";
+import { useState } from "react";
 
 function App() {
   const [theme, setTheme] = useState(true);
