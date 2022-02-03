@@ -4,18 +4,20 @@ import api from "../../../api/api";
 import moreIcon from "../../../assets/icons/more.svg";
 import lessIcon from "../../../assets/icons/less.svg";
 import {
+  ButtonAccept,
+  ButtonCancel,
   ButtonFilled,
   ContainerV,
-  SectionH,
   SectionV,
   Title,
 } from "../../styles";
 import {
-  IconsLessSheet,
+  FormSheet,
   IconsSheet,
   InputSheet,
   Option,
   Selector,
+  SelectorSheet,
   Sheet,
   SheetLabel,
   SheetLabelGroup,
@@ -40,27 +42,18 @@ const Create = () => {
     "Sabado",
     "Domingo",
   ];
-  useEffect(() => {
-    let mounted = true;
-    const exerciseData = async () => {
-      try {
-        await api.get("/exerciseList").then((response) => {
-          setLoader(true);
-          if (mounted) {
-            setExerciseList(response.data);
-            setLoader(false);
-          }
-        });
-      } catch (error) {
+  const exerciseData = async () => {
+    try {
+      setLoader(true);
+      await api.get("/exerciseList").then((response) => {
+        setExerciseList(response.data);
         setLoader(false);
-        toast.error("Erro ao buscar exercícios");
-      }
-    };
-    exerciseData();
-    return () => {
-      mounted = false;
-    };
-  }, [exerciseList]);
+      });
+    } catch (error) {
+      setLoader(false);
+      toast.error("Erro ao buscar exercícios");
+    }
+  };
 
   const exerciseStack = {
     series: "",
@@ -78,19 +71,48 @@ const Create = () => {
     setExercises(exercise);
   };
 
+  const twoInTwo = () => {
+    let results = [];
+    for (let i = 0; i <= 1000; i = i + 2) {
+      results.push(i);
+    }
+    return results;
+  };
+
+  const tenInTen = () => {
+    let results = [];
+    for (let i = 0; i <= 1000; i = i + 10) {
+      results.push(i);
+    }
+    return results;
+  };
+
+  const selectorOption = (value, modified) => {
+    if (modified) {
+      const predefined = {
+        twoInTwo: twoInTwo(),
+        tenInTen: tenInTen(),
+      };
+      return predefined[modified].map((item, i) => (
+        <Option key={i} value={item}>
+          {item}
+        </Option>
+      ));
+    }
+    let options = [];
+    for (let i = 0; i < value; i++) {
+      options.push(i + 1);
+    }
+    return options.map((item, i) => (
+      <Option key={i} value={item}>
+        {item}
+      </Option>
+    ));
+  };
+
   const postExercise = async () => {
     let exercisesList = {
-      week_day: day,
-      id_exercise_01: "",
-      id_exercise_02: "",
-      id_exercise_03: "",
-      id_exercise_04: "",
-      id_exercise_05: "",
-      id_exercise_06: "",
-      id_exercise_07: "",
-      id_exercise_08: "",
-      id_exercise_09: "",
-      id_exercise_10: "",
+      week_day: JSON.parse(day),
     };
     exercises.map(async (item, i) => {
       setLoader(true);
@@ -105,28 +127,35 @@ const Create = () => {
             id_exercise: item.id_exercise,
           })
           .then(async (response) => {
-            exercisesList[`id_exercise_0${i + 1}`] = response.data.id;
-            setLoader(false);
+            exercisesList[`id_exercise_0${i + 1}`] = await response.data.id;
           });
       } catch (error) {
         setLoader(false);
-        toast.error("Erro ao salvar a ficha");
+        toast.error("Erro ao salvar algum exercício");
       }
     });
+    console.log(exercisesList);
+    await postWeekDay(exercisesList);
+  };
 
+  const postWeekDay = async (exercisesList) => {
     try {
-      await api.post("/weekDay", exercisesList).then((response) => {
-        if (!sessionStorage.getItem("training_sheet")) {
-          sessionStorage.setItem("training_sheet", response.data.id);
-        }else{
-          const trainingSheet = sessionStorage.getItem("training_sheet")
-          sessionStorage.setItem("training_sheet", {...trainingSheet, });
-        }
+      console.log(exercisesList);
+      await api.post(`/weekDay`, exercisesList).then(async (response) => {
+        console.log(response);
+        // if (await !sessionStorage.getItem("training_sheet")) {
+        //   await sessionStorage.setItem("training_sheet", response.data.id);
+        // } else {
+        //   const trainingSheet = await sessionStorage.getItem("training_sheet");
+        //   await sessionStorage.setItem("training_sheet", { ...trainingSheet });
+        // }
+        setLoader(false);
       });
     } catch (error) {
-      
+      console.log(error.message);
+      setLoader(false);
+      toast.error("Erro ao salvar o dia da semana");
     }
-    // console.log(exercisesList);
   };
 
   return (
@@ -135,114 +164,135 @@ const Create = () => {
       <SectionV>
         <Title>Criar ficha de treino</Title>
         <Sheet>
-          <Selector
-            onChange={(event) => {
-              const selected = event.target.selectedOptions[0].value;
-              setDay(selected);
+          <FormSheet
+            action="submit"
+            onSubmit={(event) => {
+              event.preventDefault();
+              postExercise();
             }}
           >
-            {days.map((item, index) => (
-              <Option key={index} value={index + 1}>
-                {item}
-              </Option>
-            ))}
-          </Selector>
+            <Selector
+              onChange={(event) => {
+                const selected = event.target.selectedOptions[0].value;
+                setDay(selected);
+              }}
+            >
+              {days.map((item, index) => (
+                <Option key={index} value={index + 1}>
+                  {item}
+                </Option>
+              ))}
+            </Selector>
 
-          <IconsLessSheet
-            src={lessIcon}
-            onClick={() => {
-              let num = numberOfExercises;
-              num.pop();
-              setNumberOfExercises(num);
-              let newExercise = exercises;
-              newExercise.pop();
-              setExercises(newExercise);
-            }}
-          />
-
-          {numberOfExercises.map((value, i) => {
-            return (
-              <SheetSection key={i}>
-                <Selector
-                  onChange={(event) => changingValues(event, i, "id_exercise")}
-                >
-                  {exerciseList.map((item, index) => (
-                    <Option key={index} value={item.id}>
-                      {item.exercise}
-                    </Option>
-                  ))}
-                </Selector>
-                <SheetLabelGroup>
-                  <SheetLabel htmlFor="series">Séries</SheetLabel>
-                  <InputSheet
-                    value={exercises[i].series}
-                    onChange={(event) => changingValues(event, i, "series")}
-                    id="series"
-                    type="number"
-                    min="1"
-                    placeholder="Séries"
-                  />
-                </SheetLabelGroup>
-                <SheetLabelGroup>
-                  <SheetLabel htmlFor="repetitions">Repetições</SheetLabel>
-                  <InputSheet
-                    value={exercises[i].repetitions}
-                    onChange={(event) =>
-                      changingValues(event, i, "repetitions")
-                    }
-                    id="repetitions"
-                    type="number"
-                    min="1"
-                    placeholder="Repetições"
-                  />
-                </SheetLabelGroup>
-                <SheetLabelGroup>
-                  <SheetLabel htmlFor="load">Carga</SheetLabel>
-                  <InputSheet
-                    value={exercises[i].load}
-                    onChange={(event) => changingValues(event, i, "load")}
-                    id="load"
-                    type="number"
-                    min="0"
-                    placeholder="Carga"
-                  />
-                </SheetLabelGroup>
-                <SheetLabelGroup>
-                  <SheetLabel htmlFor="method">Método</SheetLabel>
-                  <InputSheet id="method" type="text" placeholder="Método" />
-                </SheetLabelGroup>
-                <SheetLabelGroup>
-                  <SheetLabel htmlFor="interval">Intervalo</SheetLabel>
-                  <InputSheet
-                    value={exercises[i].interval}
-                    onChange={(event) => changingValues(event, i, "interval")}
-                    id="interval"
-                    type="number"
-                    min="0"
-                    placeholder="Intervalo"
-                  />
-                </SheetLabelGroup>
+            {numberOfExercises.map((value, i) => {
+              return (
+                <SheetSection key={value}>
+                  <SheetLabelGroup>
+                    <SheetLabel htmlFor="exercise">Exercício</SheetLabel>
+                    <Selector
+                      id="exercise"
+                      onChange={(event) =>
+                        changingValues(event, i, "id_exercise")
+                      }
+                    >
+                      {exerciseList.map((item, index) => (
+                        <Option key={index} value={item.id}>
+                          {item.exercise}
+                        </Option>
+                      ))}
+                    </Selector>
+                  </SheetLabelGroup>
+                  <SheetLabelGroup>
+                    <SheetLabel htmlFor="series">Séries</SheetLabel>
+                    <SelectorSheet
+                      required
+                      onChange={(event) => {
+                        changingValues(event, i, "series");
+                      }}
+                      id="series"
+                    >
+                      {selectorOption(20, false)}
+                    </SelectorSheet>
+                  </SheetLabelGroup>
+                  <SheetLabelGroup>
+                    <SheetLabel htmlFor="repetitions">Repetições</SheetLabel>
+                    <SelectorSheet
+                      onChange={(event) =>
+                        changingValues(event, i, "repetitions")
+                      }
+                      required
+                      id="repetitions"
+                    >
+                      {selectorOption(100, false)}
+                    </SelectorSheet>
+                  </SheetLabelGroup>
+                  <SheetLabelGroup>
+                    <SheetLabel htmlFor="load">Carga (Kg)</SheetLabel>
+                    <SelectorSheet
+                      onChange={(event) => changingValues(event, i, "load")}
+                      required
+                      id="load"
+                    >
+                      {selectorOption(0, "twoInTwo")}
+                    </SelectorSheet>
+                  </SheetLabelGroup>
+                  <SheetLabelGroup>
+                    <SheetLabel htmlFor="interval">Intervalo (s)</SheetLabel>
+                    <SelectorSheet
+                      onChange={(event) => changingValues(event, i, "interval")}
+                      required
+                      id="interval"
+                    >
+                      {selectorOption(0, "tenInTen")}
+                    </SelectorSheet>
+                  </SheetLabelGroup>
+                  <SheetLabelGroup>
+                    <SheetLabel htmlFor="method">Método</SheetLabel>
+                    <InputSheet
+                      onChange={(event) => changingValues(event, i, "method")}
+                      required
+                      id="method"
+                      type="text"
+                      placeholder="Método"
+                    />
+                  </SheetLabelGroup>
+                  <SheetLabelGroup>
+                    <ButtonAccept>Salvar</ButtonAccept>
+                    <ButtonCancel
+                    type="button"
+                      onClick={() => {
+                        let exercise = exercises.filter((item, index) => index !== i);
+                        setExercises(exercise);
+                        let num = numberOfExercises.filter((item, index) => index !== i);
+                        setNumberOfExercises(num);
+                      }}
+                    >
+                      Excluir
+                    </ButtonCancel>
+                  </SheetLabelGroup>
+                </SheetSection>
+              );
+            })}
+            {numberOfExercises.length < 10 ? (
+              <SheetSection>
+                <IconsSheet
+                  src={moreIcon}
+                  onClick={() => {
+                    exerciseData();
+                    let num = numberOfExercises;
+                    num.push(Math.random());
+                    setNumberOfExercises(num);
+                    let newExercise = exercises;
+                    newExercise.push(exerciseStack);
+                    setExercises(newExercise);
+                  }}
+                ></IconsSheet>
               </SheetSection>
-            );
-          })}
-          {numberOfExercises.length < 10 ? (
-            <SheetSection>
-              <IconsSheet
-                src={moreIcon}
-                onClick={() => {
-                  let num = numberOfExercises;
-                  num.push(num[num.length - 1] + 1);
-                  setNumberOfExercises(num);
-                  let newExercise = exercises;
-                  newExercise.push(exerciseStack);
-                  setExercises(newExercise);
-                }}
-              ></IconsSheet>
-            </SheetSection>
-          ) : null}
-          {numberOfExercises.length >= 5 ? (
-            <ButtonFilled onClick={postExercise}>Salvar!</ButtonFilled>
-          ) : null}
+            ) : null}
+            {numberOfExercises.length >= 5 ? (
+              <ButtonFilled type="submit">Salvar!</ButtonFilled>
+            ) : null}
+          </FormSheet>
         </Sheet>
       </SectionV>
     </ContainerV>

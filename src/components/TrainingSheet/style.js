@@ -19,18 +19,25 @@ export const Sheet = styled.div`
   }
 `;
 
+export const FormSheet = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+`;
+
 export const SheetSection = styled.section`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 1rem 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
   width: 100%;
   border: 2px dotted ${corSecundaria};
   border-radius: 15px;
   padding: 0.5rem;
   margin: 1rem 0;
 
-  @media (max-width: 290px) {
-    grid-template-columns: 1fr;
+  @media (max-width: 768px) {
+    justify-content: space-around;
   }
 `;
 
@@ -43,6 +50,7 @@ export const Selector = styled.select`
   font-size: 1rem;
   font-weight: 600;
   padding: 1rem 1rem;
+  height: 100%;
 
   @media (max-width: 425px) {
     width: 100%;
@@ -56,7 +64,14 @@ export const Option = styled.option`
 
 export const InputSheet = styled(InputStandard)`
   margin: 0;
-  width: 100%;
+  width: 12rem;
+  height: 100%;
+  background-color: ${({ theme }) => theme.body};
+`;
+
+export const SelectorSheet = styled(Selector)`
+  margin: 0;
+  width: 6rem;
   background-color: ${({ theme }) => theme.body};
 `;
 
@@ -69,16 +84,11 @@ export const SheetLabel = styled.label`
 export const SheetLabelGroup = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
 `;
 
 export const IconsSheet = styled(Icons)`
-  border: 2px solid #0f0f0f;
-  border-radius: 5px;
-  padding: 2px;
-  margin: 2rem 0;
-  grid-column: span 2;
-  align-self: center;
-  justify-self: center;
+  flex-grow: 1;
 `;
 
 export const IconsLessSheet = styled(Icons)`

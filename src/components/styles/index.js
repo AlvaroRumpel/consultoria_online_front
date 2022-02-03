@@ -90,7 +90,7 @@ export const InputLarge = styled(InputStandard)`
   width: 60%;
 
   @media (max-width: 375px) {
-    width:  90%;
+    width: 90%;
   }
 `;
 
@@ -141,7 +141,27 @@ export const ButtonFilledSmall = styled(ButtonFilled)`
   width: 30%;
 
   @media (max-width: 375px) {
-    width:  90%;
+    width: 90%;
+  }
+`;
+
+export const ButtonAccept = styled(ButtonFilled)`
+  background-color: rgb(0, 230, 77);
+  border-color: rgb(0, 230, 77);
+
+  :hover {
+    background-color: rgb(0, 179, 60);
+    border-color: rgb(0, 179, 60);
+  }
+`;
+
+export const ButtonCancel = styled(ButtonFilled)`
+  background-color: rgb(204, 0, 0);
+  border-color: rgb(204, 0, 0);
+
+  :hover {
+    background-color: rgb(153, 0, 0);
+    border-color: rgb(153, 0, 0);
   }
 `;
 
